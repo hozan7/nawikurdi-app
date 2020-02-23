@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nawi_kurdi/widgets/card_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -80,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: new BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: Colors.blueGrey[50],
+                          color: Color.fromRGBO(246, 242, 230, 1.0),
                           width: 1.0,
                         ),
                       ),
@@ -92,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: <Widget>[
                         Text(
                           textDropdwon,
-                          style: TextStyle(color: Colors.blueGrey[900]),
+                          // style: TextStyle(color: Colors.blueGrey[900]),
                         ),
                         Icon(Icons.arrow_drop_down),
                       ],
@@ -110,6 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+          CardWidget(),
+          CardWidget(),
+          CardWidget(),
         ],
       ),
     );

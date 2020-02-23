@@ -27,6 +27,16 @@ class _InitializePageState extends State<InitializePage> {
           AboutusScreen(),
         ],
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => NewNameScreen()),
+      //     );
+      //   },
+      //   tooltip: 'Increment',
+      //   child: Icon(Icons.add),
+      // ),
       bottomNavigationBar: new TabBar(
         tabs: [
           Tab(
@@ -43,9 +53,9 @@ class _InitializePageState extends State<InitializePage> {
         unselectedLabelColor: Colors.white,
         indicatorSize: TabBarIndicatorSize.label,
         indicatorPadding: EdgeInsets.all(5.0),
-        indicatorColor: Colors.orange,
+        indicatorColor: Color.fromRGBO(246, 242, 230, 1.0),
       ),
-      backgroundColor: Colors.orange,
+      backgroundColor: Color.fromRGBO(206, 163, 108, 1.0),
     );
   }
 }
