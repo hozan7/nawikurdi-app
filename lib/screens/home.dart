@@ -1,14 +1,56 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nawi_kurdi/widgets/card_widget.dart';
-
+import 'package:http/http.dart' as http;
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic>names= new List();
+  ScrollController _scrollController = new ScrollController();
+
   var textDropdwon = 'هەموو';
   bool selected = false;
+
+  var offset=0;
+  String searchText="";
+
+  final _searchQuery = new TextEditingController();
+  Timer _debounce;
+  _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      searchText=_searchQuery.text;
+      offset=0;
+      fetchNames();
+    });
+  }
+
+  @override
+  void initState() {
+    fetchNames();
+    _searchQuery.addListener(_onSearchChanged);
+    _scrollController.addListener((){
+      if(_scrollController.position.pixels == _scrollController.position.maxScrollExtent){
+        fetchNames();
+        offset +=10;
+      }
+    });
+    super.initState();
+  }
+  
+  @override 
+  void dispose(){
+    _scrollController.dispose();
+
+    _searchQuery.removeListener(_onSearchChanged);
+    _searchQuery.dispose();
+
+    super.dispose();
+  }
 
   void _showcontent() {
     showDialog<Null>(
@@ -60,6 +102,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+
+  fetchNames() async {
+    var linkAPI="";
+    if(searchText.toString().isNotEmpty) {
+      linkAPI='https://api.nawikurdi.com/?limit=10&offset=$offset&q=$searchText';
+      final res= await http.get(linkAPI);
+      if(res.statusCode == 200){
+        setState(() {
+          names =jsonDecode(res.body)['names'];
+        });
+      }
+    }else {
+      linkAPI='https://api.nawikurdi.com/?limit=10&offset=$offset';
+      final res= await http.get(linkAPI);
+      if(res.statusCode == 200){
+        setState(() {
+          names +=jsonDecode(res.body)['names'];
+        });
+      }
+    }
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +158,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: <Widget>[
                         Text(
                           textDropdwon,
-                          // style: TextStyle(color: Colors.blueGrey[900]),
                         ),
                         Icon(Icons.arrow_drop_down),
                       ],
@@ -106,16 +170,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: InputBorder.none,
                       hintText: 'گەڕان',
                     ),
+                    controller: _searchQuery,
                   ),
                 ),
               ],
             ),
           ),
-          CardWidget(),
-          CardWidget(),
-          CardWidget(),
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: names.length,
+              itemBuilder: (context, int index){
+                return CardWidget(names[index]);
+              },
+            )
+          )
         ],
       ),
     );
   }
+  
 }

@@ -17,7 +17,7 @@ class _InitializePageState extends State<InitializePage> {
       appBar: AppBar(
         title: Text(
           'ناوی کوردی',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.white,),
         ),
       ),
       body: TabBarView(
@@ -49,7 +49,7 @@ class _InitializePageState extends State<InitializePage> {
             icon: new Icon(Icons.perm_identity),
           ),
         ],
-        labelColor: Colors.blueGrey[900],
+        labelColor: Color.fromRGBO(51, 20, 10, 1.0),
         unselectedLabelColor: Colors.white,
         indicatorSize: TabBarIndicatorSize.label,
         indicatorPadding: EdgeInsets.all(5.0),
