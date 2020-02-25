@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nawi_kurdi/models/card_name.dart';
 
 class CardWidget extends StatelessWidget {
-  var name="", desc="", gender="";
-  CardWidget(nameData) {
-    name=nameData['name'];
-    desc=nameData['desc'];
-    gender=nameData['gender'];
-  }
+
+  CardName nameData;
+  CardWidget(this.nameData);
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +30,15 @@ class CardWidget extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Icon(
-                  gender == 'M' ?  FontAwesomeIcons.male : gender == 'F' ? FontAwesomeIcons.female : FontAwesomeIcons.child,
-                  color: gender == 'M' ?  Colors.blue[100] : gender == 'F' ? Colors.pink[100] : Colors.orange[100],
+                  nameData.gender == 'M' ?  FontAwesomeIcons.male : nameData.gender == 'F' ? FontAwesomeIcons.female : FontAwesomeIcons.child,
+                  color: nameData.gender == 'M' ?  Colors.blue[100] : nameData.gender == 'F' ? Colors.pink[100] : Colors.orange[100],
                   size: 30,
                 ),
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.only(right: 10),
                     child: Text(
-                      name,
+                      nameData.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -60,7 +58,7 @@ class CardWidget extends StatelessWidget {
             padding: EdgeInsets.all(20),
             alignment: Alignment.centerRight,
             child: Text(
-              desc,
+              nameData.desc,
               style: TextStyle(
                 color: Color.fromRGBO(101, 40, 23, 0.7),
                 fontSize: 12,

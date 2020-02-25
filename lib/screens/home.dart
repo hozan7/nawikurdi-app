@@ -1,30 +1,33 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nawi_kurdi/models/card_name.dart';
 import 'package:nawi_kurdi/widgets/card_widget.dart';
 import 'package:http/http.dart' as http;
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<dynamic>names= new List();
+  List<dynamic> names = [];
   ScrollController _scrollController = new ScrollController();
 
   var textDropdwon = 'هەموو';
   bool selected = false;
 
-  var offset=0;
-  String searchText="";
+  var offset = 0, gender = "";
+  String searchText = "";
 
   final _searchQuery = new TextEditingController();
   Timer _debounce;
   _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      searchText=_searchQuery.text;
-      offset=0;
+      searchText = _searchQuery.text;
+      offset = 0;
       fetchNames();
     });
   }
@@ -33,17 +36,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     fetchNames();
     _searchQuery.addListener(_onSearchChanged);
-    _scrollController.addListener((){
-      if(_scrollController.position.pixels == _scrollController.position.maxScrollExtent){
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         fetchNames();
-        offset +=10;
+        offset += 10;
       }
     });
     super.initState();
   }
-  
-  @override 
-  void dispose(){
+
+  @override
+  void dispose() {
     _scrollController.dispose();
 
     _searchQuery.removeListener(_onSearchChanged);
@@ -58,43 +62,87 @@ class _HomeScreenState extends State<HomeScreen> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return new SimpleDialog(
-          // title: const Text('Select assignment'),
+          title: Center(child: const Text('ڕیزدەکەم بەپێی :')),
           children: <Widget>[
             SimpleDialogOption(
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'هەموو';
+                  names=[];
+                  gender = '';
                 });
+                fetchNames();
               },
-              child: const Text('هەموو'),
+              child: Container(
+                padding: EdgeInsets.only(right: 80),
+                child: Row(
+                  children: <Widget>[
+                    Icon(FontAwesomeIcons.starOfLife, color: Colors.grey[400], size: 15,),
+                    const Text(' هەموو '),
+                  ],
+                ),
+              ),
             ),
             SimpleDialogOption(
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'هاوبەش';
+                  names=[];
+                  gender = 'O';
                 });
+                fetchNames();
               },
-              child: const Text('هاوبەش'),
+              child: Container(
+                padding: EdgeInsets.only(right: 80),
+                child: Row(
+                  children: <Widget>[
+                    Icon(FontAwesomeIcons.child, color: Colors.orange[100], size: 15,),
+                    const Text(' هاوبەش '),
+                  ],
+                ),
+              ),
             ),
             SimpleDialogOption(
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'کوڕ';
+                  names=[];
+                  gender = 'M';
                 });
+                fetchNames();
               },
-              child: const Text('کوڕ'),
+              child: Container(
+                padding: EdgeInsets.only(right: 80),
+                child: Row(
+                  children: <Widget>[
+                    Icon(FontAwesomeIcons.male, color: Colors.blue[100], size: 15,),
+                    const Text(' کوڕ '),
+                  ],
+                ),
+              ),
             ),
             SimpleDialogOption(
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'کچ';
+                  names=[];
+                  gender = 'F';
                 });
+                fetchNames();
               },
-              child: const Text('کچ'),
+              child: Container(
+                padding: EdgeInsets.only(right: 80),
+                child: Row(
+                  children: <Widget>[
+                    Icon(FontAwesomeIcons.female, color: Colors.pink[100], size: 15,),
+                    const Text(' کچ '),
+                  ],
+                ),
+              ),
             ),
           ],
         );
@@ -102,27 +150,36 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   fetchNames() async {
-    var linkAPI="";
-    if(searchText.toString().isNotEmpty) {
-      linkAPI='https://api.nawikurdi.com/?limit=10&offset=$offset&q=$searchText';
-      final res= await http.get(linkAPI);
-      if(res.statusCode == 200){
+    var linkAPI = "";
+    if (searchText.toString().isNotEmpty) {
+      names = [];
+      if (gender.toString().isNotEmpty) {
+        linkAPI ='https://api.nawikurdi.com/?limit=30&offset=$offset&gender=$gender&q=س';
+      } else {
+        linkAPI = 'https://api.nawikurdi.com/?limit=30&offset=$offset&q=س';
+      }
+      final res = await http.get(linkAPI);
+      if (res.statusCode == 200) {
+        var result = jsonDecode(res.body)['names'];
         setState(() {
-          names =jsonDecode(res.body)['names'];
+          names += result.map((n) => CardName.fromJson(n)).toList();
         });
       }
-    }else {
-      linkAPI='https://api.nawikurdi.com/?limit=10&offset=$offset';
-      final res= await http.get(linkAPI);
-      if(res.statusCode == 200){
+    } else {
+      if (gender.toString().isNotEmpty) {
+        linkAPI ='https://api.nawikurdi.com/?limit=30&offset=$offset&gender=$gender';
+      } else {
+        linkAPI = 'https://api.nawikurdi.com/?limit=30&offset=$offset';
+      }
+      final res = await http.get(linkAPI);
+      if (res.statusCode == 200) {
+        var result = jsonDecode(res.body)['names'];
         setState(() {
-          names +=jsonDecode(res.body)['names'];
+          names += result.map((n) => CardName.fromJson(n)).toList();
         });
       }
     }
-    
   }
 
   @override
@@ -177,17 +234,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: names.length,
-              itemBuilder: (context, int index){
-                return CardWidget(names[index]);
-              },
-            )
-          )
+              child: ListView.builder(
+            controller: _scrollController,
+            itemCount: names.length,
+            itemBuilder: (context, int index) {
+              return CardWidget(names[index]);
+            },
+          ))
         ],
       ),
     );
   }
-  
 }

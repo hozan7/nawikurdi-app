@@ -43,7 +43,7 @@ class _InitializePageState extends State<InitializePage> {
             icon: new Icon(Icons.home),
           ),
           Tab(
-            icon: new Icon(Icons.add),
+            icon: new Icon(Icons.favorite),
           ),
           Tab(
             icon: new Icon(Icons.perm_identity),
