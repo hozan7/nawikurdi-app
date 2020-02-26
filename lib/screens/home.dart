@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nawi_kurdi/models/card_name.dart';
 import 'package:nawi_kurdi/widgets/card_widget.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
@@ -12,11 +13,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool loader = false;
+
   List<dynamic> names = [];
   ScrollController _scrollController = new ScrollController();
 
   var textDropdwon = 'هەموو';
-  bool selected = false;
+  bool selected = true;
 
   var offset = 0, gender = "";
   String searchText = "";
@@ -40,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
         fetchNames();
-        offset += 10;
+        offset += 30;
       }
     });
     super.initState();
@@ -69,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'هەموو';
-                  names=[];
+                  names = [];
                   gender = '';
                 });
                 fetchNames();
@@ -78,7 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.only(right: 80),
                 child: Row(
                   children: <Widget>[
-                    Icon(FontAwesomeIcons.starOfLife, color: Colors.grey[400], size: 15,),
+                    Icon(
+                      FontAwesomeIcons.starOfLife,
+                      color: Colors.grey[400],
+                      size: 15,
+                    ),
                     const Text(' هەموو '),
                   ],
                 ),
@@ -89,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'هاوبەش';
-                  names=[];
+                  names = [];
                   gender = 'O';
                 });
                 fetchNames();
@@ -98,7 +105,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.only(right: 80),
                 child: Row(
                   children: <Widget>[
-                    Icon(FontAwesomeIcons.child, color: Colors.orange[100], size: 15,),
+                    Icon(
+                      FontAwesomeIcons.child,
+                      color: Colors.orange[100],
+                      size: 15,
+                    ),
                     const Text(' هاوبەش '),
                   ],
                 ),
@@ -109,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'کوڕ';
-                  names=[];
+                  names = [];
                   gender = 'M';
                 });
                 fetchNames();
@@ -118,7 +129,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.only(right: 80),
                 child: Row(
                   children: <Widget>[
-                    Icon(FontAwesomeIcons.male, color: Colors.blue[100], size: 15,),
+                    Icon(
+                      FontAwesomeIcons.male,
+                      color: Colors.blue[100],
+                      size: 15,
+                    ),
                     const Text(' کوڕ '),
                   ],
                 ),
@@ -129,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.of(context).pop();
                 setState(() {
                   textDropdwon = 'کچ';
-                  names=[];
+                  names = [];
                   gender = 'F';
                 });
                 fetchNames();
@@ -138,7 +153,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.only(right: 80),
                 child: Row(
                   children: <Widget>[
-                    Icon(FontAwesomeIcons.female, color: Colors.pink[100], size: 15,),
+                    Icon(
+                      FontAwesomeIcons.female,
+                      color: Colors.pink[100],
+                      size: 15,
+                    ),
                     const Text(' کچ '),
                   ],
                 ),
@@ -152,23 +171,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
   fetchNames() async {
     var linkAPI = "";
+    setState(() {
+      loader = true;
+    });
     if (searchText.toString().isNotEmpty) {
       names = [];
       if (gender.toString().isNotEmpty) {
-        linkAPI ='https://api.nawikurdi.com/?limit=30&offset=$offset&gender=$gender&q=س';
+        linkAPI =
+            'https://api.nawikurdi.com/?limit=30&offset=$offset&gender=$gender&q=$searchText';
       } else {
-        linkAPI = 'https://api.nawikurdi.com/?limit=30&offset=$offset&q=س';
+        linkAPI =
+            'https://api.nawikurdi.com/?limit=30&offset=$offset&q=$searchText';
       }
       final res = await http.get(linkAPI);
       if (res.statusCode == 200) {
         var result = jsonDecode(res.body)['names'];
         setState(() {
           names += result.map((n) => CardName.fromJson(n)).toList();
+          loader = false;
         });
       }
     } else {
       if (gender.toString().isNotEmpty) {
-        linkAPI ='https://api.nawikurdi.com/?limit=30&offset=$offset&gender=$gender';
+        linkAPI =
+            'https://api.nawikurdi.com/?limit=30&offset=$offset&gender=$gender';
       } else {
         linkAPI = 'https://api.nawikurdi.com/?limit=30&offset=$offset';
       }
@@ -177,6 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
         var result = jsonDecode(res.body)['names'];
         setState(() {
           names += result.map((n) => CardName.fromJson(n)).toList();
+          loader = false;
         });
       }
     }
@@ -234,13 +261,23 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Expanded(
-              child: ListView.builder(
-            controller: _scrollController,
-            itemCount: names.length,
-            itemBuilder: (context, int index) {
-              return CardWidget(names[index]);
-            },
-          ))
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: names.length,
+              itemBuilder: (context, int index) {
+                return CardWidget(names[index]);
+              },
+            ),
+          ),
+          loader
+              ? SpinKitThreeBounce(
+                  color: Color.fromRGBO(206, 163, 108, 1.0),
+                  size: 25.0,
+                )
+              : Container(
+                  width: 0,
+                  height: 0,
+                ),
         ],
       ),
     );
