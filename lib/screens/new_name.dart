@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +21,9 @@ class NewNameScreenState extends State<NewNameScreen> {
 
   String textDropdwon = 'هاوبەش';
   String gender = 'O';
+  bool _isButtonDisabled = false;
+
+  String textContent = '';
 
   void _showcontent() {
     showDialog<Null>(
@@ -104,11 +108,57 @@ class NewNameScreenState extends State<NewNameScreen> {
   }
 
   @override
+  void initState() {
+    checkInternetConnection();
+    super.initState();
+  }
+
+  @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     _controllerName.dispose();
     _controllerMeaning.dispose();
     super.dispose();
+  }
+
+  void checkInternetConnection() async {
+    var result = await Connectivity().checkConnectivity();
+    if (result == ConnectivityResult.none) {
+      print('not connected');
+      setState(() {
+        _isButtonDisabled = true;
+        textContent = 'تکایە ئینتەرنێت پێکە ';
+      });
+    } else {
+      // ConnectivityResult.mobile + ConnectivityResult.wifi
+      print('connected');
+      setState(() {
+        _isButtonDisabled = false;
+        textContent = '';
+      });
+    }
+  }
+
+  sendName() async {
+    final body = {
+      'name': _controllerName.text,
+      'desc': _controllerMeaning.text,
+      'gender': gender
+    };
+    final res = await http.post('https://api.nawikurdi.com/', body: body);
+    print('res');
+    print(res);
+    if (res.statusCode == 200) {
+      print(jsonDecode(res.body)['status']);
+      if (jsonDecode(res.body)['status'] == 1) {
+        setState(() {
+          gender = 'O';
+          textDropdwon = 'هاوبەش';
+        });
+        _controllerName.clear();
+        _controllerMeaning.clear();
+      }
+    }
   }
 
   @override
@@ -117,14 +167,20 @@ class NewNameScreenState extends State<NewNameScreen> {
     return Scaffold(
       body: Form(
         key: _formKey,
-        child: ListView(
+        child: Column(
           children: <Widget>[
-            Image(
-              image: AssetImage('images/nawikurdi.png'),
-              height: 150.0,
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Image(
+                image: AssetImage('assets/images/nawikurdi.png'),
+                height: 150.0,
+              ),
             ),
-            Center(
-              child: Text('ناوێکی نوێ زیاد بکە '),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: Center(
+                child: Text('ناوێکی نوێ زیاد بکە '),
+              ),
             ),
             Container(
               color: Colors.white,
@@ -181,42 +237,39 @@ class NewNameScreenState extends State<NewNameScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   RaisedButton(
+                    color: _isButtonDisabled
+                        ? Colors.grey
+                        : Color.fromRGBO(206, 163, 108, 1.0),
                     onPressed: () {
-                      // Validate returns true if the form is valid, or false
-                      // otherwise.
-                      if (_formKey.currentState.validate()) {
-                        // If the form is valid, display a Snackbar.
-                        Scaffold.of(context)
-                            .showSnackBar(SnackBar(content: Text('ناردن ...')));
-                        sendName();
+                      if (!_isButtonDisabled) {
+                        if (_formKey.currentState.validate()) {
+                          // If the form is valid, display a Snackbar.
+                          Scaffold.of(context).showSnackBar(
+                              SnackBar(content: Text('ناردن ...')));
+                          sendName();
+                        }
                       }
                     },
-                    child: Text('ناردن'),
+                    child: Text(
+                      'ناردن',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
             ),
+            // Container(
+            //   color: Colors.grey,
+            //   margin: EdgeInsets.only(bottom: 0),
+            //   padding: EdgeInsets.all(15),
+            //   child: Text(
+            //     textContent,
+            //     style: TextStyle(color: Colors.white),
+            //   ),
+            // ),
           ],
         ),
       ),
     );
-  }
-
-  sendName() async {
-    final body = {'name': _controllerName.text, 'desc': _controllerMeaning.text, 'gender': gender};
-    final res = await http.post('https://api.nawikurdi.com/', body: body);
-    print('res');
-    print(res);
-    if (res.statusCode == 200) {
-      print(jsonDecode(res.body)['status']);
-      if (jsonDecode(res.body)['status'] == 1) {
-        setState(() {
-          gender = 'O';
-          textDropdwon = 'هاوبەش';
-        });
-        _controllerName.clear();
-        _controllerMeaning.clear();
-      }
-    }
   }
 }
