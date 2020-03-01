@@ -28,11 +28,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final _searchQuery = new TextEditingController();
   Timer _debounce;
+
+  String textContent = '';
+
+  bool connectivity= true;
   _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      searchText = _searchQuery.text;
-      offset = 0;
+      setState(() {
+        searchText = _searchQuery.text;
+        offset = 0;
+      });
       fetchNames();
     });
   }
@@ -56,11 +62,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void checkInternetConnection() async {
     var result = await Connectivity().checkConnectivity();
     if (result == ConnectivityResult.none) {
-      print('not connected');
-      
+      setState(() {
+        textContent = 'تکایە ئینتەرنێت پێکە بۆ بینینی ناوی زیاتر ';
+        connectivity = false;
+      });
+        
     } else {
       // ConnectivityResult.mobile + ConnectivityResult.wifi
-      print('connected');
+      setState(() {
+        textContent = '';
+        connectivity = true;
+      });
       fetchNames();
       _searchQuery.addListener(_onSearchChanged);
       _scrollController.addListener(() {
@@ -185,19 +197,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+/////////////////////////  shared prefrences  /////////////////////////////
   addDataToLocalStorage() async {
-    print('addDataToLocalStorage');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('stringValue', "abc");
   }
 
   getDataToLocalStorage() async {
-    print('getDataToLocalStorage');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return String
     var stringValue = prefs.getString('stringValue');
     print(stringValue);
   }
+//////////////////////////////////////////////////////////////////////////
 
   fetchNames() async {
     var linkAPI = "";
@@ -205,10 +217,12 @@ class _HomeScreenState extends State<HomeScreen> {
       loader = true;
     });
     if (searchText.toString().isNotEmpty) {
-      names = [];
+      setState(() {
+        names = [];
+      });
       if (gender.toString().isNotEmpty) {
         linkAPI =
-            'https://api.nawikurdi.com/?limit=30&offset=$offset&gender=$gender&q=$searchText';
+            'https://api.nawikurdi.com/?limit=30&offset=$offset&q=$searchText&gender=$gender';
       } else {
         linkAPI =
             'https://api.nawikurdi.com/?limit=30&offset=$offset&q=$searchText';
@@ -245,72 +259,99 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Container(
-            color: Colors.white,
-            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-            padding: EdgeInsets.all(0),
-            height: 50,
-            child: Row(
+          Expanded(
+            child: Column(
               children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    print('object');
-                    _showcontent();
-                    addDataToLocalStorage();
-                    getDataToLocalStorage();
-                  },
-                  child: Container(
-                    decoration: new BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: Color.fromRGBO(246, 242, 230, 1.0),
-                          width: 1.0,
+                Container(
+                  color: Colors.white,
+                  margin:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                  padding: EdgeInsets.all(0),
+                  height: 50,
+                  child: Row(
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+                          print('object');
+                          _showcontent();
+                          // addDataToLocalStorage();
+                          // getDataToLocalStorage();
+                        },
+                        child: Container(
+                          decoration: new BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: Color.fromRGBO(246, 242, 230, 1.0),
+                                width: 1.0,
+                              ),
+                            ),
+                          ),
+                          margin: EdgeInsets.only(left: 5.0),
+                          padding: EdgeInsets.only(right: 15.0),
+                          height: double.infinity,
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                textDropdwon,
+                              ),
+                              Icon(Icons.arrow_drop_down),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    margin: EdgeInsets.only(left: 5.0),
-                    padding: EdgeInsets.only(right: 15.0),
-                    height: double.infinity,
-                    child: Row(
-                      children: <Widget>[
-                        Text(
-                          textDropdwon,
+                      new Flexible(
+                        child: new TextField(
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'گەڕان',
+                          ),
+                          controller: _searchQuery,
                         ),
-                        Icon(Icons.arrow_drop_down),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                new Flexible(
-                  child: new TextField(
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'گەڕان',
-                    ),
-                    controller: _searchQuery,
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    itemCount: names.length,
+                    itemBuilder: (context, int index) {
+                      return CardWidget(names[index]);
+                    },
                   ),
                 ),
+                loader
+                  ? SpinKitThreeBounce(
+                      color: Color.fromRGBO(206, 163, 108, 1.0),
+                      size: 25.0,
+                    )
+                  : Container(
+                      width: 0,
+                      height: 0,
+                    ),
+                
               ],
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: names.length,
-              itemBuilder: (context, int index) {
-                return CardWidget(names[index]);
-              },
-            ),
-          ),
-          loader
-              ? SpinKitThreeBounce(
-                  color: Color.fromRGBO(206, 163, 108, 1.0),
-                  size: 25.0,
-                )
-              : Container(
-                  width: 0,
-                  height: 0,
+          !
+          
+          connectivity ? Row(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    textContent,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                  color: Colors.grey,
                 ),
+              ),
+            ],
+          ) : Container(width: 0, height: 0,),
         ],
       ),
     );

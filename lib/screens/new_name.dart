@@ -169,104 +169,126 @@ class NewNameScreenState extends State<NewNameScreen> {
         key: _formKey,
         child: Column(
           children: <Widget>[
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Image(
-                image: AssetImage('assets/images/nawikurdi.png'),
-                height: 150.0,
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Center(
-                child: Text('ناوێکی نوێ زیاد بکە '),
-              ),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-              padding: EdgeInsets.only(right: 20),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'ناوێک بنووسە بۆ ناردن',
-                ),
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'تکایە ناوێک بنووسە';
-                  }
-                  return null;
-                },
-                controller: _controllerName,
-              ),
-            ),
-            Container(
-              color: Colors.white,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-              padding: EdgeInsets.only(right: 20),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'مانای ناوە نووسراوەکەت بنووسە',
-                ),
-                controller: _controllerMeaning,
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                _showcontent();
-              },
-              child: Container(
-                  margin:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
-                  padding:
-                      EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
-                  color: Colors.white,
-                  child: Row(
-                    children: <Widget>[
-                      Text(
-                        textDropdwon,
-                      ),
-                      Icon(Icons.arrow_drop_down),
-                    ],
-                  )),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+            Expanded(
+              child: Column(
                 children: <Widget>[
-                  RaisedButton(
-                    color: _isButtonDisabled
-                        ? Colors.grey
-                        : Color.fromRGBO(206, 163, 108, 1.0),
-                    onPressed: () {
-                      if (!_isButtonDisabled) {
-                        if (_formKey.currentState.validate()) {
-                          // If the form is valid, display a Snackbar.
-                          Scaffold.of(context).showSnackBar(
-                              SnackBar(content: Text('ناردن ...')));
-                          sendName();
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Image(
+                      image: AssetImage('assets/images/nawikurdi.png'),
+                      height: 150.0,
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: Center(
+                      child: Text('ناوێکی نوێ زیاد بکە '),
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    padding: EdgeInsets.only(right: 20),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'ناوێک بنووسە بۆ ناردن',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'تکایە ناوێک بنووسە';
                         }
-                      }
+                        return null;
+                      },
+                      controller: _controllerName,
+                    ),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                    padding: EdgeInsets.only(right: 20),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'مانای ناوە نووسراوەکەت بنووسە',
+                      ),
+                      controller: _controllerMeaning,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _showcontent();
                     },
-                    child: Text(
-                      'ناردن',
-                      style: TextStyle(color: Colors.white),
+                    child: Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 25.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 20.0),
+                        color: Colors.white,
+                        child: Row(
+                          children: <Widget>[
+                            Text(
+                              textDropdwon,
+                            ),
+                            Icon(Icons.arrow_drop_down),
+                          ],
+                        )),
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 30),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        RaisedButton(
+                          color: _isButtonDisabled
+                              ? Colors.grey
+                              : Color.fromRGBO(206, 163, 108, 1.0),
+                          onPressed: () {
+                            if (!_isButtonDisabled) {
+                              if (_formKey.currentState.validate()) {
+                                // If the form is valid, display a Snackbar.
+                                Scaffold.of(context).showSnackBar(
+                                    SnackBar(content: Text('ناردن ...')));
+                                sendName();
+                              }
+                            }
+                          },
+                          child: Text(
+                            'ناردن',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            // Container(
-            //   color: Colors.grey,
-            //   margin: EdgeInsets.only(bottom: 0),
-            //   padding: EdgeInsets.all(15),
-            //   child: Text(
-            //     textContent,
-            //     style: TextStyle(color: Colors.white),
-            //   ),
-            // ),
+            _isButtonDisabled
+                ? Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            textContent,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(
+                    height: 0,
+                    width: 0,
+                  ),
           ],
         ),
       ),

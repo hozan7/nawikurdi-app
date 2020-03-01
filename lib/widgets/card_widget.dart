@@ -61,7 +61,7 @@ class CardWidget extends StatelessWidget {
               nameData.desc,
               style: TextStyle(
                 color: Color.fromRGBO(101, 40, 23, 0.7),
-                fontSize: 12,
+                fontSize: 14,
               ),
             ),
           ),
