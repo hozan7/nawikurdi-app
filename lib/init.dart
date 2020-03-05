@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nawi_kurdi/screens/aboutus.dart';
 import 'package:nawi_kurdi/screens/home.dart';
 import 'package:nawi_kurdi/screens/new_name.dart';
+import 'package:nawi_kurdi/screens/favorite.dart';
 
 class InitializePage extends StatefulWidget {
   InitializePage({Key key}) : super(key: key);
@@ -27,19 +28,10 @@ class _InitializePageState extends State<InitializePage> {
         children: [
           HomeScreen(),
           NewNameScreen(),
+          FavoriteScreen(),
           AboutusScreen(),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => NewNameScreen()),
-      //     );
-      //   },
-      //   tooltip: 'Increment',
-      //   child: Icon(Icons.add),
-      // ),
       bottomNavigationBar: new TabBar(
         tabs: [
           Tab(
@@ -47,6 +39,9 @@ class _InitializePageState extends State<InitializePage> {
           ),
           Tab(
             icon: new Icon(Icons.add),
+          ),
+          Tab(
+            icon: new Icon(Icons.favorite),
           ),
           Tab(
             icon: new Icon(FontAwesomeIcons.info, size: 20,),

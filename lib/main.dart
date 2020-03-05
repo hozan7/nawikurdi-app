@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: MaterialColor(0xFFCEA36C, color),
       ),
       home: DefaultTabController(
-        length: 3,
+        length: 4,
         child: InitializePage(),
       ),
     );

@@ -6,7 +6,6 @@ import 'package:nawi_kurdi/models/card_name.dart';
 import 'package:nawi_kurdi/widgets/card_widget.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity/connectivity.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -196,20 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-/////////////////////////  shared prefrences  /////////////////////////////
-  addDataToLocalStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('stringValue', "abc");
-  }
-
-  getDataToLocalStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    //Return String
-    var stringValue = prefs.getString('stringValue');
-    print(stringValue);
-  }
-//////////////////////////////////////////////////////////////////////////
 
   fetchNames() async {
     var linkAPI = "";
