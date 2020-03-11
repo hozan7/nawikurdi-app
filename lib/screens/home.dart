@@ -30,7 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String textContent = '';
 
-  bool connectivity= true;
+  bool connectivity = true;
+
+  bool autofokas= false;
   _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
@@ -65,7 +67,6 @@ class _HomeScreenState extends State<HomeScreen> {
         textContent = 'تکایە ئینتەرنێت پێکە بۆ بینینی ناوی زیاتر ';
         connectivity = false;
       });
-        
     } else {
       // ConnectivityResult.mobile + ConnectivityResult.wifi
       setState(() {
@@ -257,10 +258,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          print('object');
                           _showcontent();
-                          // addDataToLocalStorage();
-                          // getDataToLocalStorage();
+                          setState(() {
+                            autofokas= false;
+                          });
                         },
                         child: Container(
                           decoration: new BoxDecoration(
@@ -286,6 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       new Flexible(
                         child: new TextField(
+                          autofocus: autofokas,
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: 'گەڕان',
@@ -306,37 +308,39 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 loader
-                  ? SpinKitThreeBounce(
-                      color: Color.fromRGBO(206, 163, 108, 1.0),
-                      size: 25.0,
-                    )
-                  : Container(
-                      width: 0,
-                      height: 0,
-                    ),
-                
+                    ? SpinKitThreeBounce(
+                        color: Color.fromRGBO(206, 163, 108, 1.0),
+                        size: 25.0,
+                      )
+                    : Container(
+                        width: 0,
+                        height: 0,
+                      ),
               ],
             ),
           ),
-          !
-          
-          connectivity ? Row(
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    textContent,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
+          !connectivity
+              ? Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          textContent,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                  color: Colors.grey,
+                  ],
+                )
+              : Container(
+                  width: 0,
+                  height: 0,
                 ),
-              ),
-            ],
-          ) : Container(width: 0, height: 0,),
         ],
       ),
     );

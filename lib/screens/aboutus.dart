@@ -22,7 +22,6 @@ class _AboutusScreenState extends State<AboutusScreen> {
       body: Container(
         margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
         child: ListView(
-          // crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Card(
               shape: RoundedRectangleBorder(

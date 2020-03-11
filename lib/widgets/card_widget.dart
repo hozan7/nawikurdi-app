@@ -1,50 +1,63 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nawi_kurdi/models/card_name.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CardWidget extends StatelessWidget {
-  CardName nameData;
+class CardWidget extends StatefulWidget {
+  final CardName nameData;
   CardWidget(this.nameData);
 
+  @override
+  _CardWidgetState createState() => _CardWidgetState();
+}
+
+class _CardWidgetState extends State<CardWidget> {
+  bool checkFavorite = false;
+  @override
+  void initState() {
+    checkFavs();
+    super.initState();
+  }
+
   void addFavorite() async {
-    // await clearfav();
     var tmpObj = {
-      'name': nameData.name,
-      'desc': nameData.desc,
-      'gender': nameData.gender
+      'nameId': widget.nameData.nameId,
+      'name': widget.nameData.name,
+      'desc': widget.nameData.desc,
+      'gender': widget.nameData.gender
     };
     var localFavs = await getFavs();
     var localFavsArr = [];
     if (localFavs != null) {
       localFavsArr = jsonDecode(localFavs);
     }
-
-    // check if exist or not
-    // if(checkOfExist(localFavsArr,tmpObj)) localFavsArr.add(tmpObj);
-    // else localFavsArr.remove(tmpObj);
     localFavsArr.add(tmpObj);
     updateLocalData(jsonEncode(localFavsArr));
-    print(jsonDecode(await getFavs()));
+    checkFavs();
   }
 
   void removeFavorite() async {
-    var tmpObj = {
-      'name': nameData.name,
-      'desc': nameData.desc,
-      'gender': nameData.gender
-    };
     var localFavs = await getFavs();
     var localFavsArr = [];
     if (localFavs != null) {
       localFavsArr = jsonDecode(localFavs);
     }
-
-    localFavsArr.remove(tmpObj);
+    localFavsArr
+        .removeWhere((item) => item['nameId'] == widget.nameData.nameId);
     updateLocalData(jsonEncode(localFavsArr));
-    print(jsonDecode(await getFavs()));
+    checkFavs();
+  }
+
+  checkFavs() async {
+    var localFavs = await getFavs();
+    var localFavsArr = [];
+    if (localFavs != null) {
+      localFavsArr = jsonDecode(localFavs);
+    }
+    setState(() {
+      checkFavorite = localFavsArr.indexWhere((item) => item['nameId'] == widget.nameData.nameId) > -1 ? true : false;
+    });
   }
 
   /////////////////////////  shared prefrences  /////////////////////////////
@@ -53,17 +66,13 @@ class CardWidget extends StatelessWidget {
     prefs.setString('fav', favs);
   }
 
-  clearfav() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('fav');
-  }
-
   getFavs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     //Return String
     var favs = prefs.getString('fav');
     return favs;
   }
+
   //////////////////////////////////////////////////////////////////////////
 
   @override
@@ -89,14 +98,14 @@ class CardWidget extends StatelessWidget {
             child: Row(
               children: <Widget>[
                 Icon(
-                  nameData.gender == 'M'
+                  widget.nameData.gender == 'M'
                       ? FontAwesomeIcons.male
-                      : nameData.gender == 'F'
+                      : widget.nameData.gender == 'F'
                           ? FontAwesomeIcons.female
                           : FontAwesomeIcons.child,
-                  color: nameData.gender == 'M'
+                  color: widget.nameData.gender == 'M'
                       ? Colors.blue[100]
-                      : nameData.gender == 'F'
+                      : widget.nameData.gender == 'F'
                           ? Colors.pink[100]
                           : Colors.orange[100],
                   size: 30,
@@ -105,7 +114,7 @@ class CardWidget extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.only(right: 10),
                     child: Text(
-                      nameData.name,
+                      widget.nameData.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -114,6 +123,7 @@ class CardWidget extends StatelessWidget {
                     ),
                   ),
                 ),
+                !checkFavorite ?
                 GestureDetector(
                   onTap: () {
                     addFavorite();
@@ -122,9 +132,9 @@ class CardWidget extends StatelessWidget {
                     Icons.favorite_border,
                     color: Colors.red[400],
                   ),
-                ),
+                ) :
                 GestureDetector(
-                  onTap: () async{
+                  onTap: () async {
                     removeFavorite();
                   },
                   child: Icon(
@@ -139,7 +149,7 @@ class CardWidget extends StatelessWidget {
             padding: EdgeInsets.all(20),
             alignment: Alignment.centerRight,
             child: Text(
-              nameData.desc,
+              widget.nameData.desc,
               style: TextStyle(
                 color: Color.fromRGBO(101, 40, 23, 0.7),
                 fontSize: 14,

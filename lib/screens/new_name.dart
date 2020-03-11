@@ -115,7 +115,6 @@ class NewNameScreenState extends State<NewNameScreen> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     _controllerName.dispose();
     _controllerMeaning.dispose();
     super.dispose();
@@ -124,14 +123,12 @@ class NewNameScreenState extends State<NewNameScreen> {
   void checkInternetConnection() async {
     var result = await Connectivity().checkConnectivity();
     if (result == ConnectivityResult.none) {
-      print('not connected');
       setState(() {
         _isButtonDisabled = true;
         textContent = 'تکایە ئینتەرنێت پێکە ';
       });
     } else {
       // ConnectivityResult.mobile + ConnectivityResult.wifi
-      print('connected');
       setState(() {
         _isButtonDisabled = false;
         textContent = '';
@@ -146,10 +143,7 @@ class NewNameScreenState extends State<NewNameScreen> {
       'gender': gender
     };
     final res = await http.post('https://api.nawikurdi.com/', body: body);
-    print('res');
-    print(res);
     if (res.statusCode == 200) {
-      print(jsonDecode(res.body)['status']);
       if (jsonDecode(res.body)['status'] == 1) {
         setState(() {
           gender = 'O';
@@ -163,14 +157,13 @@ class NewNameScreenState extends State<NewNameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
     return Scaffold(
       body: Form(
         key: _formKey,
         child: Column(
           children: <Widget>[
             Expanded(
-              child: Column(
+              child: ListView(
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 10),
